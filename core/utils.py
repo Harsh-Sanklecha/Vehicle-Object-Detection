@@ -11,6 +11,9 @@ import re
 # pytesseract.pytesseract.tesseract_cmd = r'<full_path_to_your_tesseract_executable>'
 # Example tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract'
 
+confidence_avg = []
+
+
 # function to recognize license plate numbers using Tesseract OCR
 def recognize_plate(img, coords):
     # separate coordinates from box
@@ -249,7 +252,8 @@ def draw_bbox(image, bboxes, info = False, counted_classes = None, show_label=Tr
             cv2.rectangle(image, c1, c2, bbox_color, bbox_thick)
 
             if info:
-                print("Object found: {}, Confidence: {:.2f}, BBox Coords (xmin, ymin, xmax, ymax): {}, {}, {}, {} ".format(class_name, score, coor[0], coor[1], coor[2], coor[3]))
+                print("Object found: {}, Confidence: {:.2f}".format(class_name, score))
+                confidence_avg.append(score)
 
             if show_label:
                 bbox_mess = '%s' % (class_name)
@@ -267,6 +271,10 @@ def draw_bbox(image, bboxes, info = False, counted_classes = None, show_label=Tr
                     cv2.putText(image, "{}s detected: {}".format(key, value), (10, offset),
                             cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 255, 0), 2)
                     offset += height_ratio
+    temp_conf = 0
+    for conf in confidence_avg:
+      temp_conf = temp_conf + conf
+    print("Total Confidence: ",temp_conf/int(len(confidence_avg)))
     return image
 
 def bbox_iou(bboxes1, bboxes2):
